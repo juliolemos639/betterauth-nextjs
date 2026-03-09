@@ -32,6 +32,7 @@ import {
 import { Spinner } from "./ui/spinner"
 import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
+import { Separator } from "./ui/separator"
 
 const formSchema = z.object({
     email: z
@@ -68,6 +69,19 @@ export function SignInForm() {
         }
     }
 
+    const signInWithGoogle = async () => {
+        await authClient.signIn.social({
+            provider: "google",
+            callbackURL: "/"
+        })
+    }
+    const signInWithGithub = async () => {
+        await authClient.signIn.social({
+            provider: "github",
+            callbackURL: "/"
+        })
+    }
+
     return (
         <Card className="w-full sm:max-w-md">
             <CardHeader>
@@ -89,7 +103,6 @@ export function SignInForm() {
                                     </FieldLabel>
                                     <Input
                                         {...field}
-
                                         autoComplete="off"
                                         aria-invalid={fieldState.invalid}
                                     />
@@ -110,9 +123,9 @@ export function SignInForm() {
                                     </FieldLabel>
                                     <Input
                                         {...field}
-
                                         autoComplete="off"
                                         aria-invalid={fieldState.invalid}
+                                        type="password"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -124,23 +137,54 @@ export function SignInForm() {
                     </FieldGroup>
                 </form>
             </CardContent>
-            <CardFooter>
-                <Field orientation="horizontal" className="flex items-center justify-center w-full">
-                    <p className="text-sm flex items-center text-gray-500 gap-1">
-                        Do not have an account?
-                        <Link className="ml-1 items-center gap-1 text-blue-600 hover:underline" href="/sign-up">
+
+            <CardFooter className="flex-col w-full">
+                <Field
+                    orientation="horizontal"
+                    className="flex w-full items-center justify-between flex-col gap-2"
+                >
+                    <Button
+                        type="submit"
+                        form="signin-form"
+                        className="cursor-pointer w-full"
+                    >
+                        {form.formState.isSubmitting ? (
+                            <Spinner className="size-6" />
+                        ) : (
+                            "Sign in"
+                        )}
+                    </Button>
+
+                    <p className="text-sm flex items-center gap-1">
+                        Do not have an account?{" "}
+                        <Link href="/sign-up" className="text-blue-500">
+                            {" "}
                             Sign up
                         </Link>
                     </p>
-                    <>
-                        <Button type="button" variant="outline" onClick={() => form.reset()}>
-                            Reset
-                        </Button>
-                        <Button type="submit" form="form-rhf-demo">
-                            {form.formState.isSubmitting ? (<Spinner className="size-6" />) : ("Sign in")}
-                        </Button>
-                    </>
                 </Field>
+                <div className="flex flex-col w-full my-6 items-center justify-center">
+                    <p className="text-sm">Or</p>
+                    <Separator className="gap-6 my-1" />
+                </div>
+
+                <div className="flex flex-col w-full gap-3">
+                    <Button
+                        type="button"
+                        className="text-sm cursor-pointer"
+                        onClick={signInWithGoogle}
+                    >
+                        Continue with Google
+                    </Button>
+
+                    <Button
+                        type="button"
+                        className="text-sm cursor-pointer"
+                        onClick={signInWithGithub}
+                    >
+                        Continue with Github
+                    </Button>
+                </div>
             </CardFooter>
         </Card>
     )
