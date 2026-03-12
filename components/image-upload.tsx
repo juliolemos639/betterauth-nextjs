@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadDropzone } from "@/lib/uploadthing";
-import { OurFileRouter } from "./api/uploadthing/core";
+import { OurFileRouter } from "../app/api/uploadthing/core";
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -25,10 +25,10 @@ export default function ImageUpload({ defaultUrl, onChange, endpoint }: ImageUpl
         return (
             <div className="relative">
                 <div className="relative w-25 h-25 shadow-lg rounded-full overflow-hidden">
-                    <Image src={value} className="object-cover fill" alt="User image" />
+                    <Image src={value ?? ""} className="object-cover" fill alt="User image" />
                 </div>
                 <div className="flex mt-3 gap-2">
-                    <Button className="absolute rounded-full right-0 top-0 bg-white opacity-60 hover:opacity-100 shadow-2xl p-2 m-2 cursor-pointer"><Trash /></Button>
+                    <Trash className="absolute rounded-full left-40 top-0 text-rose-600" />
                 </div>
             </div>
         )
@@ -45,7 +45,7 @@ export default function ImageUpload({ defaultUrl, onChange, endpoint }: ImageUpl
                             : 'Drop or click to upload  an image'
                     }}
 
-                appearance={{ container: 'rounded-xl border' }}
+                appearance={{ container: 'rounded-xl border', button: '!bg-black' }}
                 onClientUploadComplete={(res) => {
                     const url = res?.[0]?.ufsUrl;
                     if (url) {

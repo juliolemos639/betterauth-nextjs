@@ -1,4 +1,5 @@
 import { updateProfile } from "@/app/actions/user";
+import { ChangePasswordForm } from "@/components/change-password";
 // import { ChangePasswordForm } from "@/components/change-password";
 // import { ToggleOtpForm } from "@/components/toggle-otp-form";
 import { UpdateProfile } from "@/components/update-profile";
@@ -18,7 +19,7 @@ export default async function UpdateProfilePage() {
                 name={user.name ?? ""}
                 image={user.image ?? ""}
             />
-            {/* <ChangePasswordForm /> */}
+            <ChangePasswordForm />
 
             {/* <ToggleOtpForm twoFactorEnabled={user.twoFactorEnabled} /> */}
         </div>

@@ -5,14 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Field,
     FieldError,
@@ -21,26 +14,23 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import Link from "next/link";
 import { toast } from "sonner";
-import { Separator } from "./ui/separator";
+import ImageUpload from "./image-upload";
 import { Spinner } from "./ui/spinner";
-import ImageUpload from "@/app/image-upload";
 
-interface UpdateProfileProps {
+interface ProfileFormProps {
     email: string;
     name: string;
     image: string;
 }
 
-const formSchema = z
-    .object({
-        name: z.string().min(3, "Enter a valid name"),
-        email: z.email("Enter a valid email adress"),
-        image: z.string("Image is required"),
-    })
+const formSchema = z.object({
+    email: z.email("Enter a valid email"),
+    name: z.string().min(3, "Enter a valid name"),
+    image: z.string("Image is required"),
+});
 
-export function UpdateProfile({ name, email, image }: UpdateProfileProps) {
+export function UpdateProfile({ name, email, image }: ProfileFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -72,15 +62,15 @@ export function UpdateProfile({ name, email, image }: UpdateProfileProps) {
     };
 
     return (
-        <Card className="w-full max-w-sm border-0 shadow-none">
+        <Card className="w-full max-w-md border-0 shadow-none">
             <CardHeader>
-                <CardTitle>Update your detais</CardTitle>
+                <CardTitle>Update your details</CardTitle>
             </CardHeader>
             <CardContent>
                 <form
-                    id="update-profile-form"
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="flex flex-col gap-6"
+                    id="update-profile"
                 >
                     <FieldGroup>
                         <Controller
@@ -118,6 +108,7 @@ export function UpdateProfile({ name, email, image }: UpdateProfileProps) {
                                 </Field>
                             )}
                         />
+
                         <Controller
                             name="image"
                             control={form.control}
@@ -125,11 +116,11 @@ export function UpdateProfile({ name, email, image }: UpdateProfileProps) {
                                 <Field data-invalid={fieldState.invalid} className="gap-1">
                                     <FieldLabel>Image</FieldLabel>
                                     <ImageUpload
-                                        defaultUrl={field.value}
+                                        endpoint="imageUploader"
+                                        defaultUrl={field.value ?? null}
                                         onChange={(url) => {
                                             field.onChange(url);
                                         }}
-                                        endpoint="imageUploader"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -137,21 +128,20 @@ export function UpdateProfile({ name, email, image }: UpdateProfileProps) {
                                 </Field>
                             )}
                         />
-
                     </FieldGroup>
 
                     <Button
                         type="submit"
-                        form="update-profile-form"
-                        className="cursor-pointer w-full"
+                        className="cursor-pointer max-w-40 self-end"
+                        disabled={form.formState.isSubmitting}
+                        form="update-profile"
                     >
                         {form.formState.isSubmitting ? (
                             <Spinner className="size-6" />
                         ) : (
-                            "Update Profile"
+                            "Update profile"
                         )}
                     </Button>
-
                 </form>
             </CardContent>
         </Card>
