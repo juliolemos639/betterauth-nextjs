@@ -187,14 +187,14 @@ export type TwoFactorOrderByWithRelationInput = {
 
 export type TwoFactorWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  userId?: string
   AND?: Prisma.TwoFactorWhereInput | Prisma.TwoFactorWhereInput[]
   OR?: Prisma.TwoFactorWhereInput[]
   NOT?: Prisma.TwoFactorWhereInput | Prisma.TwoFactorWhereInput[]
-  userId?: Prisma.StringFilter<"TwoFactor"> | string
   secret?: Prisma.StringFilter<"TwoFactor"> | string
   backupCodes?: Prisma.StringFilter<"TwoFactor"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "userId">
 
 export type TwoFactorOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -217,14 +217,14 @@ export type TwoFactorScalarWhereWithAggregatesInput = {
 }
 
 export type TwoFactorCreateInput = {
-  id: string
+  id?: string
   secret: string
   backupCodes: string
   user: Prisma.UserCreateNestedOneWithoutTwoFactorInput
 }
 
 export type TwoFactorUncheckedCreateInput = {
-  id: string
+  id?: string
   userId: string
   secret: string
   backupCodes: string
@@ -245,7 +245,7 @@ export type TwoFactorUncheckedUpdateInput = {
 }
 
 export type TwoFactorCreateManyInput = {
-  id: string
+  id?: string
   userId: string
   secret: string
   backupCodes: string
@@ -338,13 +338,13 @@ export type TwoFactorUncheckedUpdateManyWithoutUserNestedInput = {
 }
 
 export type TwoFactorCreateWithoutUserInput = {
-  id: string
+  id?: string
   secret: string
   backupCodes: string
 }
 
 export type TwoFactorUncheckedCreateWithoutUserInput = {
-  id: string
+  id?: string
   secret: string
   backupCodes: string
 }
@@ -386,7 +386,7 @@ export type TwoFactorScalarWhereInput = {
 }
 
 export type TwoFactorCreateManyUserInput = {
-  id: string
+  id?: string
   secret: string
   backupCodes: string
 }

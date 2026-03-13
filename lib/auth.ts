@@ -4,6 +4,8 @@ import db from "./db";
 import { nextCookies } from "better-auth/next-js";
 import { Resend } from "resend";
 import { sendVerificationEmail } from "./send-verification-email";
+import { twoFactor } from "better-auth/plugins";
+import { sendOtpEmail } from "./send-otp-email";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
@@ -16,6 +18,12 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
+    },
+
+    rateLimit: {
+        enabled: true,
+        window: 10,
+        max: 2,
     },
 
     emailVerification: {
@@ -43,6 +51,17 @@ export const auth = betterAuth({
             prompt: "select_account", // Optional, forces account selection on each login
         },
     },
-    plugins: [nextCookies()],
+
+    plugins: [nextCookies(),
+    twoFactor({
+        skipVerificationOnEnable: true,
+        otpOptions: {
+            async sendOTP({ user, otp }) {
+                // sendOtpEmail({ to: "atiqullah.naemi21@gmail.com", otp });
+                sendOtpEmail({ to: user.email, otp });
+            },
+        },
+    }),
+    ],
 }
 );

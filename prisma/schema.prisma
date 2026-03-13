@@ -71,7 +71,7 @@ model Account {
 
 model Verification {
   id         String   @id
-  identifier String
+  identifier String   @unique
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
@@ -81,8 +81,8 @@ model Verification {
 }
 
 model TwoFactor {
-  id          String @id
-  userId      String
+  id          String @id @default(cuid())
+  userId      String @unique
   secret      String
   backupCodes String
   user        User   @relation(references: [id], fields: [userId], onDelete: Cascade)

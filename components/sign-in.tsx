@@ -1,12 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -14,93 +12,97 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
     Field,
-    FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import {
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText,
-    InputGroupTextarea,
-} from "@/components/ui/input-group"
-import { Spinner } from "./ui/spinner"
-import { authClient } from "@/lib/auth-client"
-import Link from "next/link"
-import { Separator } from "./ui/separator"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Separator } from "./ui/separator";
+import { Spinner } from "./ui/spinner";
 
 const formSchema = z.object({
-    email: z
-        .email()
-        .min(3, "Enter a valid email."),
-    password: z.string()
-        .min(6, "Password must be at least 6 characters."),
-})
+    email: z.email("Enter a valid email adress"),
+    password: z.string().min(6, "Enter a valid password"),
+});
 
 export function SignInForm() {
+    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
             password: "",
         },
-    })
+    });
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            await authClient.signIn.email({ email: data.email, password: data.password },
+            await authClient.signIn.email(
                 {
-                    onSuccess: () => {
-                        toast.success("Signed in successfully!")
-                        form.reset()
+                    email: data.email,
+                    password: data.password,
+                    callbackURL: "/",
+                },
+                {
+                    onSuccess: async () => {
+                        const { error } = await authClient.twoFactor.sendOtp({});
+
+                        if (error) {
+                            toast.error(error.message);
+                        }
+
+                        router.push("/two-factor");
                     },
                     onError: (ctx) => {
-                        toast.error(ctx.error.message || "An error occurred while signing in. Please try again.")
-                    }
+                        toast.error(ctx.error.message);
+                    },
                 }
-            )
-        } catch (error) {
-            throw toast.error("An error occurred while signing in. Please try again.")
+            );
+        } catch {
+            throw new Error("Something went wrong");
         }
-    }
+    };
 
     const signInWithGoogle = async () => {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/"
-        })
-    }
+            callbackURL: "/",
+        });
+    };
+
     const signInWithGithub = async () => {
         await authClient.signIn.social({
             provider: "github",
-            callbackURL: "/"
-        })
-    }
+            callbackURL: "/",
+        });
+    };
 
     return (
         <Card className="w-full sm:max-w-md">
             <CardHeader>
                 <CardTitle>Sign in</CardTitle>
-                <CardDescription>
-                    Sign in to your account.
-                </CardDescription>
+                <CardDescription>Sign in to your account</CardDescription>
             </CardHeader>
             <CardContent>
-                <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                    id="signin-form"
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="flex flex-col gap-4"
+                >
                     <FieldGroup>
                         <Controller
                             name="email"
                             control={form.control}
                             render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>
-                                        Email
-                                    </FieldLabel>
+                                <Field data-invalid={fieldState.invalid} className="gap-1">
+                                    <FieldLabel>Email</FieldLabel>
                                     <Input
                                         {...field}
                                         autoComplete="off"
@@ -117,9 +119,15 @@ export function SignInForm() {
                             name="password"
                             control={form.control}
                             render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>
-                                        Password
+                                <Field data-invalid={fieldState.invalid} className="gap-1">
+                                    <FieldLabel className="flex items-center justify-between">
+                                        <span>Password</span>
+                                        <Link
+                                            className="text-blue-600 cursor-pointer"
+                                            href="/request-password"
+                                        >
+                                            Forgot password
+                                        </Link>
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -133,11 +141,9 @@ export function SignInForm() {
                                 </Field>
                             )}
                         />
-
                     </FieldGroup>
                 </form>
             </CardContent>
-
             <CardFooter className="flex-col w-full">
                 <Field
                     orientation="horizontal"
@@ -187,5 +193,5 @@ export function SignInForm() {
                 </div>
             </CardFooter>
         </Card>
-    )
+    );
 }
